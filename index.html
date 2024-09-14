@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        label, textarea, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 30px;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Email Generator</h1>
+    <form id="emailForm">
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required>
+
+        <label for="keyPoints">Key Points:</label>
+        <textarea id="keyPoints" name="keyPoints" rows="6" placeholder="Enter the main points you want to include..." required></textarea>
+
+        <input type="submit" value="Generate Email">
+    </form>
+
+    <div class="output" id="output"></div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const subject = document.getElementById('subject').value;
+            const keyPoints = document.getElementById('keyPoints').value;
+
+            // Send a POST request to the Flask backend
+            const response = await fetch('http://localhost:5000/generate-email', {  // Change this to the deployed backend URL later
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    subject: subject,
+                    keyPoints: keyPoints
+                })
+            });
+
+            const data = await response.json();
+            const emailBody = data.email_body;
+
+            document.getElementById('output').innerHTML = `<h2>Generated Email:</h2><p><b>Subject:</b> ${subject}</p><p><b>Body:</b> ${emailBody}</p>`;
+        });
+    </script>
+</body>
+</html>
