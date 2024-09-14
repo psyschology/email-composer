@@ -56,24 +56,38 @@
             const subject = document.getElementById('subject').value;
             const keyPoints = document.getElementById('keyPoints').value;
 
-            // Use GPT API for generating email
-            const response = await fetch('https://api.openai.com/v1/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer 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`
-                },
-                body: JSON.stringify({
-                    model: "gpt-3.5-turbo",
-                    prompt: `Subject: ${subject}\n\nEmail Body: Based on the following key points: ${keyPoints}.`,
-                    max_tokens: 150
-                })
-            });
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer sk-svcacct-Tv_q78D2OTs__kr52gH-eHBkNlRqCvFNpr30-YDLS0CCoHe6r-S3aTQy7xVuET3BlbkFJ3Cc3Jikcd0mcvbiU-CylIwzxZEvlUxyfknyEUsedLWyBU8WQAfzZFNnfmo4FQA`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [
+                            { role: "system", content: "You are a helpful assistant that generates emails." },
+                            { role: "user", content: `Generate an email with subject: ${subject}. The key points are: ${keyPoints}` }
+                        ],
+                        max_tokens: 150
+                    })
+                });
 
-            const data = await response.json();
-            const emailBody = data.choices[0].text;
+                if (!response.ok) {
+                    throw new Error('Failed to fetch from OpenAI API');
+                }
 
-            document.getElementById('output').innerHTML = `<h2>Generated Email:</h2><p><b>Subject:</b> ${subject}</p><p><b>Body:</b> ${emailBody}</p>`;
+                const data = await response.json();
+                const emailBody = data.choices[0].message.content;
+
+                document.getElementById('output').innerHTML = `
+                    <h2>Generated Email:</h2>
+                    <p><b>Subject:</b> ${subject}</p>
+                    <p><b>Body:</b> ${emailBody}</p>
+                `;
+            } catch (error) {
+                document.getElementById('output').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
         });
     </script>
 </body>
