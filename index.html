@@ -51,36 +51,38 @@
 
     <script>
         document.getElementById('emailForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            const subject = document.getElementById('subject').value;
-            const keyPoints = document.getElementById('keyPoints').value;
+    const subject = document.getElementById('subject').value;
+    const keyPoints = document.getElementById('keyPoints').value;
 
-            try {
-                const response = await fetch('http://localhost:3000/generate-email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ subject, keyPoints })
-                });
-
-                const data = await response.json();
-
-                // Extract the generated email from the response
-                const emailBody = data.choices[0].text;
-
-                // Display the result in the output div
-                document.getElementById('output').innerHTML = `
-                    <h2>Generated Email:</h2>
-                    <p><b>Subject:</b> ${subject}</p>
-                    <p><b>Body:</b> ${emailBody}</p>
-                `;
-            } catch (error) {
-                console.error('Error generating email:', error);
-                document.getElementById('output').innerHTML = `<p style="color: red;">Error generating email. Please try again.</p>`;
-            }
+    try {
+        const response = await fetch('http://localhost:3000/generate-email', { // Update URL here if deployed
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subject, keyPoints })
         });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const emailBody = data.emailBody;
+
+        document.getElementById('output').innerHTML = `
+            <h2>Generated Email:</h2>
+            <p><b>Subject:</b> ${subject}</p>
+            <p><b>Body:</b> ${emailBody}</p>
+        `;
+    } catch (error) {
+        console.error('Error generating email:', error);
+        document.getElementById('output').innerHTML = `<p>Error generating email. Please try again.</p>`;
+    }
+});
+
     </script>
 </body>
 </html>
