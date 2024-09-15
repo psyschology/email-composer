@@ -56,22 +56,30 @@
             const subject = document.getElementById('subject').value;
             const keyPoints = document.getElementById('keyPoints').value;
 
-const response = await fetch('http://localhost:3000/generate-email', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ subject, keyPoints })
-});
+            try {
+                const response = await fetch('http://localhost:3000/generate-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ subject, keyPoints })
+                });
 
-const emailBody = await response.json();
-console.log(emailBody);
+                const data = await response.json();
 
+                // Extract the generated email from the response
+                const emailBody = data.choices[0].text;
 
-            const data = await response.json();
-            const emailBody = data.choices[0].text;
-
-            document.getElementById('output').innerHTML = <h2>Generated Email:</h2><p><b>Subject:</b> ${subject}</p><p><b>Body:</b> ${emailBody}</p>;
+                // Display the result in the output div
+                document.getElementById('output').innerHTML = `
+                    <h2>Generated Email:</h2>
+                    <p><b>Subject:</b> ${subject}</p>
+                    <p><b>Body:</b> ${emailBody}</p>
+                `;
+            } catch (error) {
+                console.error('Error generating email:', error);
+                document.getElementById('output').innerHTML = `<p style="color: red;">Error generating email. Please try again.</p>`;
+            }
         });
     </script>
 </body>
